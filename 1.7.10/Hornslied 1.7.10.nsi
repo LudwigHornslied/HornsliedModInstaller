@@ -1,6 +1,6 @@
 SetCompressor lzma
 
-; Installer Setting
+; 인스톨러 기본 정보 설정
 !define PRODUCT_NAME "Hornslied ${MCVER}"
 !define PRODUCT_VERSION "${MCVER} v1"
 !define PRODUCT_PUBLISHER "Ludwig Hornslied"
@@ -23,7 +23,7 @@ AutoCloseWindow true
 Caption "${MCVER} 마인크래프트 모드 간편설치기 v1"
 RequestExecutionLevel user
 
-; Include Header files
+; 헤더 파일
 !include "MUI.nsh"
 !include "Update.nsh"
 !include "HornsliedLibrary.nsh"
@@ -31,7 +31,7 @@ RequestExecutionLevel user
 !include "nsDialogs_createTextMultiline.nsh"
 !include "LogicLib.nsh"
 
-; Variable
+; 변수 선언
 Var 'ISO'
 Var 'TMPINSTDIR'
 Var 'Dlg'
@@ -47,31 +47,28 @@ Var 'DirIcon'
 Var 'License'
 Var 'DirDsNtExst'
 
-; Functions
+; 함수
 Function MyInit
-Aero::Apply
-SetOutPath $TEMP
-SetOverWrite on
-call InternetCheck
-InitPluginsDir
-File "splash.bmp"
-newadvsplash::show /NOUNLOAD 1000 500 500 0xe236d6 "$TEMP\splash.bmp"
-delete "splash.bmp"
-call Update
-!insertmacro MUI_INSTALLOPTIONS_READ $7 "License.ini" "Field 1" "State"
-!insertmacro MUI_INSTALLOPTIONS_EXTRACT "Setup.ini"
+Aero::Apply ; Aero 플러그인 활성화
+SetOutPath $TEMP ; 다운로드 경로를 $TEMP로 지정한다.
+SetOverWrite on ; 덮어쓰기 허용
+call InternetCheck ; InternetCheck 함수 호출(HornsliedLibrary 헤더 파일)
+File "splash.bmp" ; splash.bmp 다운로드
+newadvsplash::show /NOUNLOAD 1000 500 500 0xe236d6 "$TEMP\splash.bmp" ; splash.bmp 파일로 스플래시 화면
+delete "splash.bmp" ; splash.bmp 삭제
+call Update ; Update 함수 호출(Update 헤더 파일)
+; 커스텀 페이지 압축 해제
 !insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallOption1.ini"
 !insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallOption2.ini"
 !insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallOption3.ini"
 !insertmacro MUI_INSTALLOPTIONS_EXTRACT "FinishPage.ini"
-!insertmacro MUI_INSTALLOPTIONS_WRITE "Setup.ini" "Field 4" "State" "$INSTDIR"
-!insertmacro MUI_INSTALLOPTIONS_WRITE "Setup.ini" "Field 7" "State" "http://hornslied.tistory.com/"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 4" "State" "http://hornslied.tistory.com/"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 5" "State" "$DOCUMENTS\HornsliedInstaller\Modbackup\1.7.10"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 6" "State" "http://hornslied.tistory.com/23"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 7" "State" "https://github.com/LudwigHornslied"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 8" "State" "http://hornslied.tistory.com/guestbook"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 10" "Text" "$PLUGINSDIR\doge.ico"
+InitPluginsDir
 SetOutPath $PLUGINSDIR
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile9.uf@2379063C574B17D61A9B16.ico" "folder.ico"
 File "License.txt"
@@ -116,28 +113,28 @@ nsDialogs::Show
 FunctionEnd
 
 Function LicenseLstner
-${NSD_GetState} $LicenseChk $LicenseLstner
-IfFileExists "$INSTDIR\logs\latest.log" NextCheck NextDisable
+${NSD_GetState} $LicenseChk $LicenseLstner ; 라이센스 동의 체크박스의 상태를 LicenseLstner 변수에 불러온다.
+IfFileExists "$INSTDIR\logs\latest.log" NextCheck NextDisable ; 사용자가 지정한 경로에 logs/lastest.log 경로가 있는지 확인한다. 있으면 NextCheck 없으면 NextDisable로 분기한다.
 NextCheck:
-StrCmp $LicenseLstner '1' NextEnable NextDisable
+StrCmp $LicenseLstner '1' NextEnable NextDisable ; LicenseLstner에 불러온 체크박스의 상태를 1과 비교하여 체크되어 있는지 확인한다. 있으면 NextEnable 없으면 NextDisable로 분기한다.
 NextEnable:
-GetDlgItem $Dlg $HWNDPARENT 1
-EnableWindow $Dlg 1
-goto NextEnd
+GetDlgItem $Dlg $HWNDPARENT 1 ; 화면 창의 '다음' 버튼을 변수 Dlg에 불러온다.
+EnableWindow $Dlg 1 ; Dlg 변수에 불러온 '다음' 버튼을 활성화한다.
+goto NextEnd ; NextEnd 레이블로 건너뛴다.
 NextDisable:
-GetDlgItem $Dlg $HWNDPARENT 1
-EnableWindow $Dlg 0
+GetDlgItem $Dlg $HWNDPARENT 1 ; 화면 창의 '다음' 버튼을 변수 Dlg에 불러온다.
+EnableWindow $Dlg 0 ; Dlg 변수에 불러온 '다음' 버튼을 비활성화한다.
 NextEnd:
 FunctionEnd
 
 Function DirButton
-nsDialogs::SelectFolderDialog "경로 지정"
-Pop $TMPINSTDIR
-${IfNot} $TMPINSTDIR == "error"
-StrCpy $INSTDIR $TMPINSTDIR
+nsDialogs::SelectFolderDialog "경로 지정" ; 경로 지정이라는 제목의 폴더 선택 화면을 띄운다.
+Pop $TMPINSTDIR ; 폴더 선택 화면에서 선택한 경로를 TMPINSTDIR 변수에 불러온다.
+${IfNot} $TMPINSTDIR == "error" ; TMPINSTDIR에 불러온 경로가 'error'가 아닐 경우에
+StrCpy $INSTDIR $TMPINSTDIR ; TMPINSTDIR에 불러온 경로를 다시 INSTDIR로 집어넣는다.
 ${EndIf}
-${NSD_SetText} $DirReq $INSTDIR
-call MinecraftExist
+${NSD_SetText} $DirReq $INSTDIR ; 경로 표시 컨트롤의 내용을 변수 INSTDIR의 내용으로 바꾼다.
+call MinecraftExist ; MinecraftExist 함수 호출
 FunctionEnd
 
 Function DirReq
@@ -146,15 +143,15 @@ call LicenseLstner
 FunctionEnd
 
 Function MinecraftExist
-IfFileExists "$INSTDIR\logs\latest.log" MCExists NoMCExists
+IfFileExists "$INSTDIR\logs\latest.log" MCExists NoMCExists ; 사용자가 지정한 경로에 logs/lastest.log 경로가 있는지 확인한다. 있으면 MCExists 없으면 NoMCExists로 분기한다.
 MCExists:
-ShowWindow $DirDsNtExst ${SW_HIDE}
-call LicenseLstner
-goto MCExEnd
+ShowWindow $DirDsNtExst ${SW_HIDE} ; DirDsExst 변수에 지정된 컨트롤(해당 경로에 마인크래프트가 없을시 뜨는 경고 문구)을 숨긴다.
+call LicenseLstner ; LicenseLstner 함수 호출
+goto MCExEnd ; MCExEnd 레이블로 건너뛴다.
 NoMCExists:
-ShowWindow $DirDsNtExst ${SW_SHOW}
-SetCtlColors $DirDsNtExst 0xff0000 transparent
-call LicenseLstner
+ShowWindow $DirDsNtExst ${SW_SHOW} ; DirDsExst 변수에 지정된 컨트롤(해당 경로에 마인크래프트가 없을시 뜨는 경고 문구)을 표시한다.
+SetCtlColors $DirDsNtExst 0xff0000 transparent ; DirDsExst 변수에 지정된 컨트롤의 색상을 텍스트 ff0000(빨강), 배경 투명으로 설정한다.
+call LicenseLstner ; LicenseLstner 함수 호출
 MCExEnd:
 FunctionEnd
 
@@ -174,26 +171,27 @@ Function InstallOption3
 FunctionEnd
 
 Function Instfiles_Pre
-GetDlgItem $R1 $HWNDPARENT 1
-ShowWindow $R1 ${SW_HIDE}
-GetDlgItem $R2 $HWNDPARENT 2
-ShowWindow $R2 ${SW_HIDE}
-GetDlgItem $R3 $HWNDPARENT 3
-ShowWindow $R3 ${SW_HIDE}
+GetDlgItem $Dlg $HWNDPARENT 1
+ShowWindow $Dlg ${SW_HIDE}
+GetDlgItem $Dlg $HWNDPARENT 2
+ShowWindow $Dlg ${SW_HIDE}
+GetDlgItem $Dlg $HWNDPARENT 3
+ShowWindow $Dlg ${SW_HIDE}
 FunctionEnd
 
 Function FinishPage
 !insertmacro MUI_HEADER_TEXT "모드 설치를 완료했습니다." "이용해 주셔서 감사합니다."
-GetDlgItem $R0 $HWNDPARENT 1
-ShowWindow $R0 ${SW_SHOW}
-SendMessage $R0 ${WM_SETTEXT} 0 "STR:마침"
-GetDlgItem $R1 $HWNDPARENT 2
-ShowWindow $R1 ${SW_SHOW}
-GetDlgItem $R3 $HWNDPARENT 3
-ShowWindow $R3 ${SW_HIDE}
+GetDlgItem $Dlg $HWNDPARENT 1
+ShowWindow $Dlg ${SW_SHOW}
+SendMessage $Dlg ${WM_SETTEXT} 0 "STR:마침"
+GetDlgItem $Dlg $HWNDPARENT 2
+ShowWindow $Dlg ${SW_SHOW}
+GetDlgItem $Dlg $HWNDPARENT 3
+ShowWindow $Dlg ${SW_HIDE}
 !insertmacro MUI_INSTALLOPTIONS_DISPLAY_RETURN "FinishPage.ini"
 FunctionEnd
 
+; .onGUIInit의 함수를 MyInit으로 대체한다.
 !define MUI_CUSTOMFUNCTION_GUIINIT MyInit
 ; Setup page
 Page custom Setup
@@ -215,7 +213,6 @@ Page custom FinishPage
 ReserveFile "InstallOption1.ini"
 ReserveFile "InstallOption2.ini"
 ReserveFile "InstallOption3.ini"
-ReserveFile "Setup.ini"
 ReserveFile "FinishPage.ini"
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
 
