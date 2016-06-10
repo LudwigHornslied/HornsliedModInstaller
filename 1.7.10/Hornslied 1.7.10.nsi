@@ -223,7 +223,7 @@ InstallDir "$APPDATA\.minecraft" ; 변수 경로 INSTDIR의 경로 지정
 ShowInstDetails show
 
 ; 섹션(설치 내용)
-Section "MainSection" SEC01
+Section "Mods" SEC01
 SetOutPath "$PLUGINSDIR"
 SetOverWrite ifnewer
 call MinecraftCheck
