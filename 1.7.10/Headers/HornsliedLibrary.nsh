@@ -24,7 +24,7 @@ Process:
 Processes::FindProcess "javaw"
 StrCmp $R0 "1" MineExeCheck MineExeNone
 MineExeCheck:
-MessageBox MB_ICONEXCLAMATION "마인크래프트가 실행되어 있습니다. 마인크래프트를 종료 후 다시 시도해 주십시오." IDOK Process
+MessageBox MB_ICONEXCLAMATION "마인크래프트가 실행되어 있습니다.$\n 마인크래프트를 종료 후 다시 시도해 주십시오." IDOK Process
 MineExeNone:
 FunctionEnd
 

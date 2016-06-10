@@ -62,6 +62,7 @@ call Update ; Update 함수 호출(Update 헤더 파일)
 !insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallOption2.ini"
 !insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallOption3.ini"
 !insertmacro MUI_INSTALLOPTIONS_EXTRACT "FinishPage.ini"
+; FinishPage 버튼 상태 설정
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 4" "State" "http://hornslied.tistory.com/"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 5" "State" "$DOCUMENTS\HornsliedInstaller\Modbackup\1.7.10"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 6" "State" "http://hornslied.tistory.com/23"
@@ -69,10 +70,10 @@ call Update ; Update 함수 호출(Update 헤더 파일)
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 8" "State" "http://hornslied.tistory.com/guestbook"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 10" "Text" "$PLUGINSDIR\doge.ico"
 InitPluginsDir
-SetOutPath $PLUGINSDIR
-NSISdl::download "http://hornslied.tistory.com/attachment/cfile9.uf@2379063C574B17D61A9B16.ico" "folder.ico"
-File "License.txt"
-File "doge.ico"
+SetOutPath $PLUGINSDIR ; 다운로드 경로를 $PLUGINSDIR로 지정한다.
+File "folder.ico" ; folder.ico(폴더 아이콘) 파일 다운로드
+File "License.txt" ; License.txt(라이센스 내용) 파일 다운로드
+File "doge.ico" ; doge.ico(LOL Doge) 파일 다운로드
 FunctionEnd
 
 Function Setup
@@ -105,11 +106,11 @@ Pop $DirButton
 ${NSD_OnClick} $DirButton "DirButton"
 nsDialogs::CreateControl RichEdit20A ${WS_VISIBLE}|${WS_CHILD}|${WS_TABSTOP}|${WS_VSCROLL}|${ES_READONLY}|${ES_MULTILINE}|${ES_WANTRETURN} ${__NSD_Text_EXSTYLE} 20 28 560 102 ""
 Pop $License
-nsRichEdit::Load $License "$PLUGINSDIR\License.txt"
+nsRichEdit::Load $License "$PLUGINSDIR\License.txt" ; nsRichEdit 플러그인을 이용해 License에 지정된 텍스트 컨트롤의 내용을 License.txt의 파일 내용으로 대체한다.
 GetDlgItem $Dlg $HWNDPARENT 1
 EnableWindow $Dlg 0
-call MinecraftExist
-nsDialogs::Show
+call MinecraftExist ; MinecraftExist 함수 호출
+nsDialogs::Show ; 화면 표시
 FunctionEnd
 
 Function LicenseLstner
@@ -138,8 +139,8 @@ call MinecraftExist ; MinecraftExist 함수 호출
 FunctionEnd
 
 Function DirReq
-${NSD_GetText} $DirReq $INSTDIR
-call LicenseLstner
+${NSD_GetText} $DirReq $INSTDIR ; DirReq 변수에 지정된 컨트롤의 텍스트를 INSTDIR 변수 경로로 설정한다.
+call LicenseLstner ; LicenseLstner 함수 호출
 FunctionEnd
 
 Function MinecraftExist
@@ -156,18 +157,18 @@ MCExEnd:
 FunctionEnd
 
 Function InstallOption1
-!insertmacro MUI_HEADER_TEXT "설치할 모드들을 선택해 주십시오." "(L)이 붙어있는 모드는 라이트로더 설치를 필요로 합니다."
-!insertmacro MUI_INSTALLOPTIONS_DISPLAY_RETURN "InstallOption1.ini"
+!insertmacro MUI_HEADER_TEXT "설치할 모드들을 선택해 주십시오." "(L)이 붙어있는 모드는 라이트로더 설치를 필요로 합니다." ; 헤더 텍스트 설정
+!insertmacro MUI_INSTALLOPTIONS_DISPLAY_RETURN "InstallOption1.ini" ; 커스텀 페이지 표시
 FunctionEnd
 
 Function InstallOption2
-!insertmacro MUI_HEADER_TEXT "설치할 모드들을 선택해 주십시오." "(L)이 붙어있는 모드는 라이트로더 설치를 필요로 합니다."
-!insertmacro MUI_INSTALLOPTIONS_DISPLAY_RETURN "InstallOption2.ini"
+!insertmacro MUI_HEADER_TEXT "설치할 모드들을 선택해 주십시오." "(L)이 붙어있는 모드는 라이트로더 설치를 필요로 합니다." ; 헤더 텍스트 설정
+!insertmacro MUI_INSTALLOPTIONS_DISPLAY_RETURN "InstallOption2.ini" ; 커스텀 페이지 표시
 FunctionEnd
 
 Function InstallOption3
-!insertmacro MUI_HEADER_TEXT "설치할 모드들을 선택해 주십시오." "(L)이 붙어있는 모드는 라이트로더 설치를 필요로 합니다."
-!insertmacro MUI_INSTALLOPTIONS_DISPLAY_RETURN "InstallOption3.ini"
+!insertmacro MUI_HEADER_TEXT "설치할 모드들을 선택해 주십시오." "(L)이 붙어있는 모드는 라이트로더 설치를 필요로 합니다." ; 헤더 텍스트 설정
+!insertmacro MUI_INSTALLOPTIONS_DISPLAY_RETURN "InstallOption3.ini" ; 커스텀 페이지 표시
 FunctionEnd
 
 Function Instfiles_Pre
@@ -180,7 +181,7 @@ ShowWindow $Dlg ${SW_HIDE}
 FunctionEnd
 
 Function FinishPage
-!insertmacro MUI_HEADER_TEXT "모드 설치를 완료했습니다." "이용해 주셔서 감사합니다."
+!insertmacro MUI_HEADER_TEXT "모드 설치를 완료했습니다." "이용해 주셔서 감사합니다." ; 헤더 텍스트 설정
 GetDlgItem $Dlg $HWNDPARENT 1
 ShowWindow $Dlg ${SW_SHOW}
 SendMessage $Dlg ${WM_SETTEXT} 0 "STR:마침"
@@ -188,14 +189,14 @@ GetDlgItem $Dlg $HWNDPARENT 2
 ShowWindow $Dlg ${SW_SHOW}
 GetDlgItem $Dlg $HWNDPARENT 3
 ShowWindow $Dlg ${SW_HIDE}
-!insertmacro MUI_INSTALLOPTIONS_DISPLAY_RETURN "FinishPage.ini"
+!insertmacro MUI_INSTALLOPTIONS_DISPLAY_RETURN "FinishPage.ini" ; 커스텀 페이지 표시
 FunctionEnd
 
 ; .onGUIInit의 함수를 MyInit으로 대체한다.
 !define MUI_CUSTOMFUNCTION_GUIINIT MyInit
-; Setup page
+; 페이지 함수 Setup 호출
 Page custom Setup
-; InstallOption Page
+; 페이지 함수 InstallOption1~3 호출
 Page custom InstallOption1
 Page custom InstallOption2
 Page custom InstallOption3
@@ -204,32 +205,29 @@ Page custom InstallOption3
 !define MUI_TEXT_INSTALLING_SUBTITLE "1.7.10 버전 모드들을 설치하고 있습니다."
 !define MUI_PAGE_CUSTOMFUNCTION_PRE Instfiles_Pre
 !insertmacro MUI_PAGE_INSTFILES
-; Finish page
+; 페이지 함수 FinishPage 호출
 Page custom FinishPage
-; Language files
+; 언어 파일
 !insertmacro MUI_LANGUAGE "Korean"
 
-; Reserve files
+; ini 파일 압축
 ReserveFile "InstallOption1.ini"
 ReserveFile "InstallOption2.ini"
 ReserveFile "InstallOption3.ini"
 ReserveFile "FinishPage.ini"
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
 
-; MUI end ------
-
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "Hornslied 1.7.10.exe"
-InstallDir "$APPDATA\.minecraft"
+OutFile "Hornslied 1.7.10.exe" ; 컴파일시 나오는 파일 이름 지정
+InstallDir "$APPDATA\.minecraft" ; 변수 경로 INSTDIR의 경로 지정
 ShowInstDetails show
 
-; Sections
+; 섹션(설치 내용)
 Section "MainSection" SEC01
 SetOutPath "$PLUGINSDIR"
 SetOverWrite ifnewer
 call MinecraftCheck
 call MineExeCheck
-
 File "7za.exe"
 
 !insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption1.ini" "Field 7" "State"
@@ -252,13 +250,13 @@ NSISdl::download "http://hornslied.tistory.com/attachment/cfile21.uf@2675E64C571
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile21.uf@2573964C571260EA131581.002" "Forge.7z.002"
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile24.uf@2163004C571260F12156B0.003" "Forge.7z.003"
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile5.uf@2250904C571260F4301E70.004" "Forge.7z.004"
-nsexec::exec '7za.exe x "$PLUGINSDIR\Forge.7z.001"'
-Copyfiles "$PLUGINSDIR\Forge\typesafe" "$INSTDIR\libraries\com"
-Copyfiles "$PLUGINSDIR\Forge\minecraftforge" "$INSTDIR\libraries\net"
-Copyfiles "$PLUGINSDIR\Forge\scala-lang" "$INSTDIR\libraries\org"
-delete "$INSTDIR\versions\1.7.10 Hornslied\*"
-CreateDirectory "$INSTDIR\versions\1.7.10 Hornslied"
-Copyfiles "$PLUGINSDIR\Forge\1.7.10 Hornslied\1.7.10 Hornslied.json" "$INSTDIR\versions\1.7.10 Hornslied"
+Nsis7z::Extract "$PLUGINSDIR\Forge.7z.001"
+Copyfiles "$PLUGINSDIR\Forge\typesafe" "$APPDATA\.minecraft\libraries\com"
+Copyfiles "$PLUGINSDIR\Forge\minecraftforge" "$APPDATA\.minecraft\libraries\net"
+Copyfiles "$PLUGINSDIR\Forge\scala-lang" "$APPDATA\.minecraft\libraries\org"
+delete "$APPDATA\.minecraft\versions\1.7.10 Hornslied\*"
+CreateDirectory "$APPDATA\.minecraft\versions\1.7.10 Hornslied"
+Copyfiles "$PLUGINSDIR\Forge\1.7.10 Hornslied\1.7.10 Hornslied.json" "$APPDATA\.minecraft\versions\1.7.10 Hornslied"
 call ModFolder
 NoForgeInstall:
 
@@ -465,9 +463,129 @@ NoDLInstall:
 !insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 3" "State"
 StrCmp $ISO "1" IC2Install NoIC2Install
 IC2Install:
-NSISdl::download "http://hornslied.tistory.com/attachment/cfile8.uf@21147C3E57125E4D10A583.jar" "industrialcraft-2-2.2.820-experimental.jar"
-Copyfiles "$PLUGINSDIR\industrialcraft-2-2.2.820-experimental.jar" "$INSTDIR\mods"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile9.uf@250BDF385755A8C50BB212.jar" "industrialcraft-2-2.2.822-experimental.jar"
+Copyfiles "$PLUGINSDIR\industrialcraft-2-2.2.822-experimental.jar" "$INSTDIR\mods"
 NoIC2Install:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 4" "State"
+StrCmp $ISO "1" TEInstall NoTEInstall
+TEInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile25.uf@25672E3E57125E6038EB50.jar" "ThermalExpansion-[1.7.10]4.1.2-240.jar"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile28.uf@216AFC4F5755A4841A42E1.jar" "ThermalFoundation-[1.7.10]1.2.4-114.jar"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile9.uf@277C834F5755A4A50D9C01.jar" "CoFHCore-[1.7.10]3.1.2-325.jar"
+Copyfiles "$PLUGINSDIR\ThermalExpansion-[1.7.10]4.1.2-240.jar" "$INSTDIR\mods"
+Copyfiles "$PLUGINSDIR\ThermalFoundation-[1.7.10]1.2.4-114.jar" "$INSTDIR\mods"
+Copyfiles "$PLUGINSDIR\CoFHCore-[1.7.10]3.1.2-325.jar" "$INSTDIR\mods"
+NoTEInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 5" "State"
+StrCmp $ISO "1" DIInstall NoDIInstall
+DIInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile8.uf@2672EA3E57125E352B438D.jar" "Damage-Indicators-Mod-1.7.10.jar"
+Copyfiles "$PLUGINSDIR\Damage-Indicators-Mod-1.7.10.jar" "$INSTDIR\mods"
+NoDIInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 6" "State"
+StrCmp $ISO "1" ShaderInstall NoShaderInstall
+ShaderInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile2.uf@2177263E57125E5C285538.jar" "ShadersModCore-v2.3.31-mc1.7.10-f.jar"
+Copyfiles "$PLUGINSDIR\ShadersModCore-v2.3.31-mc1.7.10-f.jar" "$INSTDIR\mods"
+NoShaderInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 7" "State"
+StrCmp $ISO "1" SPCInstall NoSPCInstall
+SPCInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile10.uf@217EF6445753047A02AE97.jar" "spc-5.4-1.7.10.jar"
+Copyfiles "$PLUGINSDIR\spc-5.4-1.7.10.jar" "$INSTDIR\mods"
+NoSPCInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 8" "State"
+StrCmp $ISO "1" WorldEInstall NoWorldEInstall
+WorldEInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile9.uf@210C5D48575304A316914D.jar" "worldedit-forge-mc1.7.10-6.0-beta-01.jar"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile26.uf@2479713E57125E67261DBF.litemod" "WorldEdit-CUI-Mod-1.7.10.litemod"
+Copyfiles "$PLUGINSDIR\worldedit-forge-mc1.7.10-6.0-beta-01.jar" "$INSTDIR\mods"
+Copyfiles "$PLUGINSDIR\WorldEdit-CUI-Mod-1.7.10.litemod" "$INSTDIR\mods"
+NoWorldEInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 9" "State"
+StrCmp $ISO "1" CraftGuideInstall NoCraftGuideInstall
+CraftGuideInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile30.uf@261C743E57125E2608BBF0.jar" "CraftGuide-1.6.8.2-forge.jar"
+Copyfiles "$PLUGINSDIR\CraftGuide-1.6.8.2-forge.jar" "$INSTDIR\mods"
+NoCraftGuideInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 10" "State"
+StrCmp $ISO "1" ChickenChunkInstall NoChickenChunkInstall
+ChickenChunkInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile5.uf@2171673E57125E252C79C4.jar" "CodeChickenCore-1.7.10-1.0.4.29-universal.jar"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile9.uf@266CFC3E57125E24307674.jar" "ChickenChunks-1.7.10-1.3.4.19-universal.jar"
+Copyfiles "$PLUGINSDIR\CodeChickenCore-1.7.10-1.0.4.29-universal.jar" "$INSTDIR\mods"
+Copyfiles "$PLUGINSDIR\ChickenChunks-1.7.10-1.3.4.19-universal.jar" "$INSTDIR\mods"
+NoChickenChunkInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 11" "State"
+StrCmp $ISO "1" ForestryInstall NoForestryInstall
+ForestryInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile10.uf@2669DD3E57125E3A340DD9.jar" "forestry_1.7.10-4.2.11.59.jar"
+Copyfiles "$PLUGINSDIR\forestry_1.7.10-4.2.11.59.jar" "$INSTDIR\mods"
+NoForestryInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 12" "State"
+StrCmp $ISO "1" CustomNPCInstall NoCustomNPCInstall
+CustomNPCInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile21.uf@21048C3E57125E2E1FFBCB.jar" "CustomNPCs_mod-1.7.10d.jar"
+Copyfiles "$PLUGINSDIR\CustomNPCs_mod-1.7.10d.jar" "$INSTDIR\mods"
+NoCustomNPCInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 13" "State"
+StrCmp $ISO "1" AM2Install NoAM2Install
+AM2Install:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile25.uf@2218E14C573F3BFF1EB844.001" "1.7.10_AM2-1.4.0.009.7z.001"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile29.uf@2233834C573F3BA007942B.002" "1.7.10_AM2-1.4.0.009.7z.002"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile9.uf@2535F24C573F3BA306F259.003" "1.7.10_AM2-1.4.0.009.7z.003"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile21.uf@23575B49573F3BCF29EADD.jar" "AnimationAPI-1.7.10-1.2.4.jar"
+Nsis7z::Extract "$PLUGINSDIR\1.7.10_AM2-1.4.0.009.7z.001"
+Copyfiles "$PLUGINSDIR\1.7.10_AM2-1.4.0.009.jar" "$INSTDIR\mods"
+Copyfiles "$PLUGINSDIR\AnimationAPI-1.7.10-1.2.4.jar" "$INSTDIR\mods"
+NoAM2Install:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 14" "State"
+StrCmp $ISO "1" ThaumInstall NoThaumInstall
+ThaumInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile5.uf@253712445718DE4E031260.001" "Thaumcraft-1.7.10-4.2.3.5.7z.001"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile25.uf@24577D445718DE541560E1.002" "Thaumcraft-1.7.10-4.2.3.5.7z.002"
+Nsis7z::Extract "$PLUGINSDIR\Thaumcraft-1.7.10-4.2.3.5.7z.001"
+Copyfiles "$PLUGINSDIR\Thaumcraft-1.7.10-4.2.3.5.jar" "$INSTDIR\mods"
+NoThaumInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 15" "State"
+StrCmp $ISO "1" GalacticInstall NoGalacticInstall
+GalacticInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile6.uf@241C283E57125E4209EEDB.jar" "Galacticraft-Planets-1.7-3.0.12.454.jar"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile25.uf@216B643E57125E46320DFA.jar" "GalacticraftCore-1.7-3.0.12.454.jar"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile21.uf@2468E93E57125E52351C70.jar" "MicdoodleCore-1.7-3.0.12.454.jar"
+Copyfiles "$PLUGINSDIR\Galacticraft-Planets-1.7-3.0.12.454.jar" "$INSTDIR\mods"
+Copyfiles "$PLUGINSDIR\GalacticraftCore-1.7-3.0.12.454.jar" "$INSTDIR\mods"
+Copyfiles "$PLUGINSDIR\MicdoodleCore-1.7-3.0.12.454.jar" "$INSTDIR\mods"
+NoGalacticInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 16" "State"
+StrCmp $ISO "1" MMNMInstall NoMMNMInstall
+MMNMInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile30.uf@262C7C36575306AD258527.001" "Mine Mine no Mi-1.7.10-0.2.4.7z.001"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile21.uf@222A5636575306B2272B8F.002" "Mine Mine no Mi-1.7.10-0.2.4.7z.002"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile8.uf@223FC036575306B61439C0.003" "Mine Mine no Mi-1.7.10-0.2.4.7z.003"
+Nsis7z::Extract "$PLUGINSDIR\Mine Mine no Mi-1.7.10-0.2.4.7z.001"
+Copyfiles "$PLUGINSDIR\Mine Mine no Mi-1.7.10-0.2.4.jar" "$INSTDIR\mods"
+NoMMNMInstall:
+
+!insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption3.ini" "Field 17" "State"
+StrCmp $ISO "1" TwilightInstall NoTwilightInstall
+TwilightInstall:
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile25.uf@216B823E57125E6432B24F.jar" "twilightforest-1.7.10-2.3.7.jar"
+Copyfiles "$PLUGINSDIR\twilightforest-1.7.10-2.3.7.jar" "$INSTDIR\mods"
+NoTwilightInstall:
 
 ExecShell "open" "http://hornslied.tistory.com/"
 SectionEnd
