@@ -1,10 +1,4 @@
-SetCompressor lzma
-
 ; 인스톨러 기본 정보 설정
-!define PRODUCT_NAME "Hornslied ${MCVER}"
-!define PRODUCT_VERSION "${MCVER} v1"
-!define PRODUCT_PUBLISHER "Ludwig Hornslied"
-!define PRODUCT_WEB_SITE "http://hornslied.tistory.com/"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "header.bmp"
 !define MUI_HEADERIMAGE_LEFT
@@ -14,13 +8,17 @@ SetCompressor lzma
 !define LIBDIR "$INSTDIR\libraries\*"
 !define MCVER "1.7.10"
 !define VERSION_URL "http://cfs.tistory.com/custom/blog/203/2032529/skin/images/version1710.ini"
-!define INST_VERSION "1"
+!define INST_VERSION "B1"
 !define INTERNET_FILE "http://hornslied.tistory.com/attachment/cfile2.uf@2231A2395710F687033C0D.txt"
 !define COLOR_WINDOW 5
-BrandingText "Ludwig's Minecraft Mod Installer"
-Setfont 나눔고딕 10
-AutoCloseWindow true
-Caption "${MCVER} 마인크래프트 모드 간편설치기 v1"
+BrandingText "Ludwig's Minecraft Mod Installer" ; 하단 브랜딩 텍스트 지정
+Setfont 나눔고딕 10 ; 설치기 기본 폰트를 나눔고딕, 10pt로 지정
+AutoCloseWindow true ; 설치 완료 후 자동으로 페이지 넘김
+Caption "${MCVER} 마인크래프트 모드 간편설치기 Beta-1" ; 설치파일 타이틀 지정
+OutFile "Hornslied 1.7.10.exe" ; 컴파일시 나오는 파일 이름 지정
+InstallDir "$APPDATA\.minecraft" ; 변수 경로 INSTDIR의 경로 지정
+ShowInstDetails show ; 설치 페이지에서 세부사항 표시
+SetCompressor zlib ; 압축 알고리즘을 zlib으로 설정
 RequestExecutionLevel user
 
 ; 헤더 파일
@@ -28,17 +26,18 @@ RequestExecutionLevel user
 !include "Update.nsh"
 !include "HornsliedLibrary.nsh"
 !include "nsDialogs.nsh"
-!include "nsDialogs_createTextMultiline.nsh"
 !include "LogicLib.nsh"
 
 ; 변수 선언
 Var 'ISO'
 Var 'TMPINSTDIR'
 Var 'Dlg'
+Var 'Welcome'
+Var 'WelcomeImg1'
+Var 'WelcomeImg2'
+Var 'WelcomeImg3'
+Var 'Desc'
 Var 'Setup'
-Var 'SetupBg'
-Var 'LicenseBox'
-Var 'DirBox'
 Var 'LicenseChk'
 Var 'LicenseLstner'
 Var 'DirReq'
@@ -54,7 +53,7 @@ SetOutPath $TEMP ; 다운로드 경로를 $TEMP로 지정한다.
 SetOverWrite on ; 덮어쓰기 허용
 call InternetCheck ; InternetCheck 함수 호출(HornsliedLibrary 헤더 파일)
 File "splash.bmp" ; splash.bmp 다운로드
-newadvsplash::show /NOUNLOAD 1000 500 500 0xe236d6 "$TEMP\splash.bmp" ; splash.bmp 파일로 스플래시 화면
+newadvsplash::show /NOUNLOAD 1000 500 500 0xe236d6 "$TEMP\splash.bmp" ; splash.bmp 파일로 스플래시 화면 출력
 delete "splash.bmp" ; splash.bmp 삭제
 call Update ; Update 함수 호출(Update 헤더 파일)
 ; 커스텀 페이지 압축 해제
@@ -68,16 +67,60 @@ call Update ; Update 함수 호출(Update 헤더 파일)
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 6" "State" "http://hornslied.tistory.com/23"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 7" "State" "https://github.com/LudwigHornslied"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 8" "State" "http://hornslied.tistory.com/guestbook"
+!insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 9" "State" "http://hornslied.tistory.com/25"
 !insertmacro MUI_INSTALLOPTIONS_WRITE "FinishPage.ini" "Field 10" "Text" "$PLUGINSDIR\doge.ico"
 InitPluginsDir
 SetOutPath $PLUGINSDIR ; 다운로드 경로를 $PLUGINSDIR로 지정한다.
-File "folder.ico" ; folder.ico(폴더 아이콘) 파일 다운로드
 File "License.txt" ; License.txt(라이센스 내용) 파일 다운로드
 File "doge.ico" ; doge.ico(LOL Doge) 파일 다운로드
+File "folder.ico" ; folder.ico(폴더 아이콘) 파일 다운로드
+File "welcome1.bmp" ; welcome1.bmp 파일 다운로드
+File "welcome2.bmp" ; welcome2.bmp 파일 다운로드
+File "welcome3.bmp" ; welcome3.bmp 파일 다운로드
+File "Version.txt" ; Version.txt 파일 다운로드
+FunctionEnd
+
+Function Welcome
+!insertmacro MUI_HEADER_TEXT "환영합니다" "마인크래프트 모드 설치를 시작합니다."
+nsDialogs::Create 1018
+Pop $Welcome
+
+${If} $Welcome == error
+Abort
+${EndIf}
+${NSD_CreateGroupBox} 305 104 295 159 "제작자의 말"
+nsDialogs::CreateControl RichEdit20A ${WS_VISIBLE}|${WS_CHILD}|${WS_TABSTOP}|${WS_VSCROLL}|${ES_READONLY}|${ES_MULTILINE}|${ES_WANTRETURN} ${__NSD_Text_EXSTYLE} 315 124 275 129 ""
+Pop $Desc
+nsRichEdit::Load $Desc "$PLUGINSDIR\Version.txt" ; nsRichEdit 플러그인을 이용해 Desc에 지정된 텍스트 컨트롤의 내용을 Version.txt의 파일 내용으로 대체한다.
+${NSD_CreateBitmap} 0 0 600 94
+Pop $WelcomeImg1
+${NSD_SetStretchedImage} $WelcomeImg1 "$PLUGINSDIR\welcome1.bmp" $0
+${NSD_OnClick} $WelcomeImg1 Imillianum
+${NSD_CreateBitmap} 0 104 295 74
+Pop $WelcomeImg2
+${NSD_SetStretchedImage} $WelcomeImg2 "$PLUGINSDIR\welcome2.bmp" $0
+${NSD_OnClick} $WelcomeImg2 Arka
+${NSD_CreateBitmap} 0 188 295 74
+Pop $WelcomeImg3
+${NSD_SetStretchedImage} $WelcomeImg3 "$PLUGINSDIR\welcome3.bmp" $0
+${NSD_OnClick} $WelcomeImg3 GuestBook
+nsDialogs::Show ; 화면 표시
+FunctionEnd
+
+Function Imillianum
+ExecShell "open" "http://hornslied.tistory.com/"
+FunctionEnd
+
+Function Arka
+ExecShell "open" "http://cafe.naver.com/arkaserver/"
+FunctionEnd
+
+Function GuestBook
+ExecShell "open" "http://hornslied.tistory.com/guestbook/"
 FunctionEnd
 
 Function Setup
-!insertmacro MUI_HEADER_TEXT "환영합니다" "모드 설치를 위해 약관 동의 및 마인크래프트 경로를 지정해 주십시오."
+!insertmacro MUI_HEADER_TEXT "약관 동의 및 마인크래프트 경로 지정" "모드 설치를 위해 약관 동의 및 마인크래프트 경로를 지정해 주십시오."
 nsDialogs::Create 1018
 Pop $Setup
 
@@ -85,17 +128,14 @@ ${If} $Setup == error
 Abort
 ${EndIf}
 ${NSD_CreateGroupBox} 0 0 600 263 ""
-Pop $SetupBg
 ${NSD_CreateGroupBox} 10 8 580 132 "라이센스 약관"
-Pop $LicenseBox
 ${NSD_CreateGroupBox} 10 150 580 60 "마인크래프트 경로(.minecraft)"
-Pop $DirBox
 ${NSD_CreateCheckBox} 20 223 240 20 "이용 약관을 읽었으며 이에 동의합니다."
 Pop $LicenseChk
 ${NSD_OnClick} $LicenseChk "LicenseLstner"
-${NSD_CreateIcon} 20 170 32 32
-${NSD_CreateLabel} 300 225 290 20 "해당 경로에는 마인크래프트가 설치되지 않았습니다."
+${NSD_CreateLabel} 300 225 290 20 "해당 경로에는 마인크래프트가 존재하지 않습니다."
 Pop $DirDsNtExst
+${NSD_CreateIcon} 20 170 32 32
 Pop $DirIcon
 ${NSD_SetIcon} $DirIcon "$PLUGINSDIR\folder.ico" $6
 ${NSD_CreateDirRequest} 60 175 435 25 $INSTDIR
@@ -140,7 +180,7 @@ FunctionEnd
 
 Function DirReq
 ${NSD_GetText} $DirReq $INSTDIR ; DirReq 변수에 지정된 컨트롤의 텍스트를 INSTDIR 변수 경로로 설정한다.
-call LicenseLstner ; LicenseLstner 함수 호출
+call MinecraftExist ; MinecraftExist 함수 호출
 FunctionEnd
 
 Function MinecraftExist
@@ -194,6 +234,8 @@ FunctionEnd
 
 ; .onGUIInit의 함수를 MyInit으로 대체한다.
 !define MUI_CUSTOMFUNCTION_GUIINIT MyInit
+; 페이지 함수 Welcome 호출
+Page custom Welcome
 ; 페이지 함수 Setup 호출
 Page custom Setup
 ; 페이지 함수 InstallOption1~3 호출
@@ -207,8 +249,9 @@ Page custom InstallOption3
 !insertmacro MUI_PAGE_INSTFILES
 ; 페이지 함수 FinishPage 호출
 Page custom FinishPage
-; 언어 파일
-!insertmacro MUI_LANGUAGE "Korean"
+
+; 언어 설정
+!insertmacro MUI_LANGUAGE "Korean" ; 설치기 기본 언어를 한국어로 지정
 
 ; ini 파일 압축
 ReserveFile "InstallOption1.ini"
@@ -216,11 +259,6 @@ ReserveFile "InstallOption2.ini"
 ReserveFile "InstallOption3.ini"
 ReserveFile "FinishPage.ini"
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
-
-Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "Hornslied 1.7.10.exe" ; 컴파일시 나오는 파일 이름 지정
-InstallDir "$APPDATA\.minecraft" ; 변수 경로 INSTDIR의 경로 지정
-ShowInstDetails show
 
 ; 섹션(설치 내용)
 Section "Mods" SEC01
@@ -250,7 +288,7 @@ NSISdl::download "http://hornslied.tistory.com/attachment/cfile21.uf@2675E64C571
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile21.uf@2573964C571260EA131581.002" "Forge.7z.002"
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile24.uf@2163004C571260F12156B0.003" "Forge.7z.003"
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile5.uf@2250904C571260F4301E70.004" "Forge.7z.004"
-Nsis7z::Extract "$PLUGINSDIR\Forge.7z.001"
+nsexec::exec '$PLUGINSDIR\7za.exe x "$PLUGINSDIR\Forge.7z.001"'
 Copyfiles "$PLUGINSDIR\Forge\typesafe" "$APPDATA\.minecraft\libraries\com"
 Copyfiles "$PLUGINSDIR\Forge\minecraftforge" "$APPDATA\.minecraft\libraries\net"
 Copyfiles "$PLUGINSDIR\Forge\scala-lang" "$APPDATA\.minecraft\libraries\org"
@@ -449,8 +487,8 @@ NoMatmosInstall:
 !insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption2.ini" "Field 16" "State"
 StrCmp $ISO "1" ArrowCamInstall NoArrowCamInstall
 ArrowCamInstall:
-NSISdl::download "http://hornslied.tistory.com/attachment/cfile30.uf@2112CF3E57125E2111F845.jar" "Arrow-Camera-Mod-1.8.jar"
-Copyfiles "$PLUGINSDIR\Arrow-Camera-Mod-1.8.jar" "$INSTDIR\mods"
+NSISdl::download "http://hornslied.tistory.com/attachment/cfile4.uf@21223739575D17840AEED7.jar" "1.7.2_arrowcam_v1.1.jar"
+Copyfiles "$PLUGINSDIR\1.7.2_arrowcam_v1.1.jar" "$INSTDIR\mods"
 NoArrowCamInstall:
 
 !insertmacro MUI_INSTALLOPTIONS_READ $ISO "InstallOption2.ini" "Field 17" "State"
@@ -545,7 +583,7 @@ NSISdl::download "http://hornslied.tistory.com/attachment/cfile25.uf@2218E14C573
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile29.uf@2233834C573F3BA007942B.002" "1.7.10_AM2-1.4.0.009.7z.002"
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile9.uf@2535F24C573F3BA306F259.003" "1.7.10_AM2-1.4.0.009.7z.003"
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile21.uf@23575B49573F3BCF29EADD.jar" "AnimationAPI-1.7.10-1.2.4.jar"
-Nsis7z::Extract "$PLUGINSDIR\1.7.10_AM2-1.4.0.009.7z.001"
+nsexec::exec '$PLUGINSDIR\7za.exe x "$PLUGINSDIR\1.7.10_AM2-1.4.0.009.7z.001"'
 Copyfiles "$PLUGINSDIR\1.7.10_AM2-1.4.0.009.jar" "$INSTDIR\mods"
 Copyfiles "$PLUGINSDIR\AnimationAPI-1.7.10-1.2.4.jar" "$INSTDIR\mods"
 NoAM2Install:
@@ -555,7 +593,7 @@ StrCmp $ISO "1" ThaumInstall NoThaumInstall
 ThaumInstall:
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile5.uf@253712445718DE4E031260.001" "Thaumcraft-1.7.10-4.2.3.5.7z.001"
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile25.uf@24577D445718DE541560E1.002" "Thaumcraft-1.7.10-4.2.3.5.7z.002"
-Nsis7z::Extract "$PLUGINSDIR\Thaumcraft-1.7.10-4.2.3.5.7z.001"
+nsexec::exec '$PLUGINSDIR\7za.exe x "$PLUGINSDIR\Thaumcraft-1.7.10-4.2.3.5.7z.001"'
 Copyfiles "$PLUGINSDIR\Thaumcraft-1.7.10-4.2.3.5.jar" "$INSTDIR\mods"
 NoThaumInstall:
 
@@ -576,7 +614,7 @@ MMNMInstall:
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile30.uf@262C7C36575306AD258527.001" "Mine Mine no Mi-1.7.10-0.2.4.7z.001"
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile21.uf@222A5636575306B2272B8F.002" "Mine Mine no Mi-1.7.10-0.2.4.7z.002"
 NSISdl::download "http://hornslied.tistory.com/attachment/cfile8.uf@223FC036575306B61439C0.003" "Mine Mine no Mi-1.7.10-0.2.4.7z.003"
-Nsis7z::Extract "$PLUGINSDIR\Mine Mine no Mi-1.7.10-0.2.4.7z.001"
+nsexec::exec '$PLUGINSDIR\7za.exe x "$PLUGINSDIR\Mine Mine no Mi-1.7.10-0.2.4.7z.001"'
 Copyfiles "$PLUGINSDIR\Mine Mine no Mi-1.7.10-0.2.4.jar" "$INSTDIR\mods"
 NoMMNMInstall:
 
