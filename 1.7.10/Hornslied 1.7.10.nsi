@@ -8,13 +8,13 @@
 !define LIBDIR "$INSTDIR\libraries\*"
 !define MCVER "1.7.10"
 !define VERSION_URL "http://cfs.tistory.com/custom/blog/203/2032529/skin/images/version1710.ini"
-!define INST_VERSION "B1"
+!define INST_VERSION "B1.1"
 !define INTERNET_FILE "http://hornslied.tistory.com/attachment/cfile2.uf@2231A2395710F687033C0D.txt"
 !define COLOR_WINDOW 5
 BrandingText "Ludwig's Minecraft Mod Installer" ; 하단 브랜딩 텍스트 지정
 Setfont 나눔고딕 10 ; 설치기 기본 폰트를 나눔고딕, 10pt로 지정
 AutoCloseWindow true ; 설치 완료 후 자동으로 페이지 넘김
-Caption "${MCVER} 마인크래프트 모드 간편설치기 Beta-2" ; 설치파일 타이틀 지정
+Caption "${MCVER} 마인크래프트 모드 간편설치기 Beta-1.1" ; 설치파일 타이틀 지정
 OutFile "Hornslied 1.7.10.exe" ; 컴파일시 나오는 파일 이름 지정
 InstallDir "$APPDATA\.minecraft" ; 변수 경로 INSTDIR의 경로 지정
 ShowInstDetails show ; 설치 페이지에서 세부사항 표시
