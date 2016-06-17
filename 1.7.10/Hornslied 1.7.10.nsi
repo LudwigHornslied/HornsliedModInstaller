@@ -14,7 +14,7 @@
 BrandingText "Ludwig's Minecraft Mod Installer" ; 하단 브랜딩 텍스트 지정
 Setfont 나눔고딕 10 ; 설치기 기본 폰트를 나눔고딕, 10pt로 지정
 AutoCloseWindow true ; 설치 완료 후 자동으로 페이지 넘김
-Caption "${MCVER} 마인크래프트 모드 간편설치기 Beta-1" ; 설치파일 타이틀 지정
+Caption "${MCVER} 마인크래프트 모드 간편설치기 Beta-2" ; 설치파일 타이틀 지정
 OutFile "Hornslied 1.7.10.exe" ; 컴파일시 나오는 파일 이름 지정
 InstallDir "$APPDATA\.minecraft" ; 변수 경로 INSTDIR의 경로 지정
 ShowInstDetails show ; 설치 페이지에서 세부사항 표시
@@ -88,27 +88,27 @@ Pop $Welcome
 ${If} $Welcome == error
 Abort
 ${EndIf}
-${NSD_CreateGroupBox} 305 104 295 159 "제작자의 말"
+${NSD_CreateGroupBox} 305 104 295 159 "제작자의 말" ; 그룹박스 컨트롤 생성
 nsDialogs::CreateControl RichEdit20A ${WS_VISIBLE}|${WS_CHILD}|${WS_TABSTOP}|${WS_VSCROLL}|${ES_READONLY}|${ES_MULTILINE}|${ES_WANTRETURN} ${__NSD_Text_EXSTYLE} 315 124 275 129 ""
 Pop $Desc
 nsRichEdit::Load $Desc "$PLUGINSDIR\Version.txt" ; nsRichEdit 플러그인을 이용해 Desc에 지정된 텍스트 컨트롤의 내용을 Version.txt의 파일 내용으로 대체한다.
-${NSD_CreateBitmap} 0 0 600 94
+${NSD_CreateBitmap} 0 0 600 94 ; 비트맵 컨트롤 생성
 Pop $WelcomeImg1
 ${NSD_SetStretchedImage} $WelcomeImg1 "$PLUGINSDIR\welcome1.bmp" $0
-${NSD_OnClick} $WelcomeImg1 Imillianum
+${NSD_OnClick} $WelcomeImg1 FmForum
 ${NSD_CreateBitmap} 0 104 295 74
 Pop $WelcomeImg2
 ${NSD_SetStretchedImage} $WelcomeImg2 "$PLUGINSDIR\welcome2.bmp" $0
 ${NSD_OnClick} $WelcomeImg2 Arka
-${NSD_CreateBitmap} 0 188 295 74
+${NSD_CreateBitmap} 0 188 295 74 ; 비트맵 컨트롤 생성
 Pop $WelcomeImg3
 ${NSD_SetStretchedImage} $WelcomeImg3 "$PLUGINSDIR\welcome3.bmp" $0
 ${NSD_OnClick} $WelcomeImg3 GuestBook
 nsDialogs::Show ; 화면 표시
 FunctionEnd
 
-Function Imillianum
-ExecShell "open" "http://hornslied.tistory.com/"
+Function FmForum
+ExecShell "open" "https://www.fmforum.net/"
 FunctionEnd
 
 Function Arka
@@ -222,13 +222,13 @@ FunctionEnd
 
 Function FinishPage
 !insertmacro MUI_HEADER_TEXT "모드 설치를 완료했습니다." "이용해 주셔서 감사합니다." ; 헤더 텍스트 설정
-GetDlgItem $Dlg $HWNDPARENT 1
-ShowWindow $Dlg ${SW_SHOW}
-SendMessage $Dlg ${WM_SETTEXT} 0 "STR:마침"
+GetDlgItem $Dlg $HWNDPARENT 1 ; 화면 창의 '다음' 버튼을 변수 Dlg에 불러온다.
+ShowWindow $Dlg ${SW_SHOW} ; Dlg 변수에 불러온 '다음' 버튼을 표시한다.
+SendMessage $Dlg ${WM_SETTEXT} 0 "STR:마침" ; Dlg 변수에 불러온 '다음' 버튼의 텍스트를 문자열 '마침' 으로 바꾼다.
 GetDlgItem $Dlg $HWNDPARENT 2
 ShowWindow $Dlg ${SW_SHOW}
-GetDlgItem $Dlg $HWNDPARENT 3
-ShowWindow $Dlg ${SW_HIDE}
+GetDlgItem $Dlg $HWNDPARENT 3 ; 화면 창의 '이전' 버튼을 변수 Dlg에 불러온다.
+ShowWindow $Dlg ${SW_HIDE} ; Dlg 변수에 불러온 '이전' 버튼을 숨긴다.
 !insertmacro MUI_INSTALLOPTIONS_DISPLAY_RETURN "FinishPage.ini" ; 커스텀 페이지 표시
 FunctionEnd
 
@@ -238,14 +238,21 @@ FunctionEnd
 Page custom Welcome
 ; 페이지 함수 Setup 호출
 Page custom Setup
+; 모드 출처 페이지 구성
+!define MUI_TEXT_LICENSE_TITLE "모드 출처"
+!define MUI_TEXT_LICENSE_SUBTITLE "이 설치기에 사용된 모드들의 제작자 및 출처입니다."
+!define MUI_LICENSEPAGE_TEXT_TOP ""
+!define MUI_LICENSEPAGE_TEXT_BOTTOM "출처 및 제작자 기재에 잘못된 부분이 있다면 알려주시기 바랍니다."
+!define MUI_LICENSEPAGE_BUTTON "다음 >"
+!insertmacro MUI_PAGE_LICENSE "Authors.rtf"
 ; 페이지 함수 InstallOption1~3 호출
 Page custom InstallOption1
 Page custom InstallOption2
 Page custom InstallOption3
 ; Instfiles page
-!define MUI_TEXT_INSTALLING_TITLE "모드 설치중"
-!define MUI_TEXT_INSTALLING_SUBTITLE "1.7.10 버전 모드들을 설치하고 있습니다."
-!define MUI_PAGE_CUSTOMFUNCTION_PRE Instfiles_Pre
+!define MUI_TEXT_INSTALLING_TITLE "모드 설치중" ; 헤더 텍스트 설정
+!define MUI_TEXT_INSTALLING_SUBTITLE "1.7.10 버전 모드들을 설치하고 있습니다." ; 헤더 텍스트 설정 2
+!define MUI_PAGE_CUSTOMFUNCTION_PRE Instfiles_Pre ; 페이지 시작 전 Instfiles_Pre 함수 호출
 !insertmacro MUI_PAGE_INSTFILES
 ; 페이지 함수 FinishPage 호출
 Page custom FinishPage
