@@ -54,7 +54,6 @@ SetOverWrite on ; 덮어쓰기 허용
 call InternetCheck ; InternetCheck 함수 호출(HornsliedLibrary 헤더 파일)
 File "splash.bmp" ; splash.bmp 다운로드
 newadvsplash::show /NOUNLOAD 1000 500 500 0xe236d6 "$TEMP\splash.bmp" ; splash.bmp 파일로 스플래시 화면 출력
-delete "splash.bmp" ; splash.bmp 삭제
 call Update ; Update 함수 호출(Update 헤더 파일)
 ; 커스텀 페이지 압축 해제
 !insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallOption1.ini"
@@ -78,6 +77,13 @@ File "welcome1.bmp" ; welcome1.bmp 파일 다운로드
 File "welcome2.bmp" ; welcome2.bmp 파일 다운로드
 File "welcome3.bmp" ; welcome3.bmp 파일 다운로드
 File "Version.txt" ; Version.txt 파일 다운로드
+FunctionEnd
+
+Function .onGUIEnd
+delete "$PLUGINSDIR\*"
+delete "$TEMP\*"
+RMDir "$PLUGINSDIR"
+RMDir "$TEMP"
 FunctionEnd
 
 Function Welcome
